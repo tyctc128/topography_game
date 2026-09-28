@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <meta name="theme-color" content="#3e2723" />
+    <title>黏土捏地形</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <video id="video" class="pip hidden" playsinline muted autoplay></video>
+    <canvas id="gl"></canvas>
+    <canvas id="overlay"></canvas>
+    <div id="tag1000" class="tag hidden">1000m</div>
+    <div id="jar-left" class="jar-label hidden">100%</div>
+    <div id="jar-right" class="jar-label hidden">100%</div>
+
+    <!-- 遊戲中 -->
+    <div id="hud" class="hidden">
+      <div id="task" class="panel">
+        <div id="task-title"></div>
+        <div id="task-text"></div>
+      </div>
+      <div id="top-buttons">
+        <button id="btn-undo" class="btn">↶ 復原</button>
+        <button id="btn-reset" class="btn">重來</button>
+        <button id="btn-help" class="btn">？</button>
+        <button id="btn-levels" class="btn">選關</button>
+      </div>
+      <div id="legend" class="panel"></div>
+      <div id="tools" class="panel">
+        <div class="tools-title">手指工具</div>
+        <button class="tool" data-tool="drop">🟢<span>放黏土</span></button>
+        <button class="tool" data-tool="raise">⬆️<span>拉高</span></button>
+        <button class="tool" data-tool="press">✋<span>壓平</span></button>
+        <button class="tool" data-tool="smooth">〰️<span>抹平</span></button>
+        <button class="tool" data-tool="rotate">🔄<span>轉動</span></button>
+      </div>
+      <div id="view-buttons" class="panel">
+        <button class="vbtn" data-view="left" aria-label="向左轉">⟲</button>
+        <button class="vbtn" data-view="right" aria-label="向右轉">⟳</button>
+        <button class="vbtn" data-view="top">俯視</button>
+        <button class="vbtn" data-view="side">側看</button>
+        <button class="vbtn" data-view="reset">還原</button>
+      </div>
+      <div id="hand-status" class="pill hidden"></div>
+      <button id="btn-check" class="btn big primary">檢查</button>
+    </div>
+    <div id="toast" class="hidden"></div>
+
+    <!-- 開始畫面 -->
+    <section id="screen-start" class="screen">
+      <div class="card">
+        <h1>黏土捏地形</h1>
+        <p class="lead">用雙手捏黏土，做出臺灣的平原、台地、丘陵、山地和盆地！</p>
+        <div class="choices">
+          <button class="btn big primary" data-cam="none">👆 用手指玩<small>在黏土上捏；在土盤外面拖曳可以轉動整個畫面</small></button>
+          <button class="btn big" data-cam="user">🙌 用手勢玩<small>開前鏡頭，手在螢幕前面捏；也可以同時用手指</small></button>
+        </div>
+        <p id="start-msg" class="msg"></p>
+        <p class="note">鏡頭畫面只在這台 iPad 上即時處理，不會存檔，也不會上傳。</p>
+      </div>
+    </section>
+
+    <!-- 選關 -->
+    <section id="screen-levels" class="screen hidden">
+      <div class="card wide">
+        <h2>選一個關卡</h2>
+        <div id="level-grid"></div>
+      </div>
+    </section>
+
+    <!-- 任務卡 -->
+    <section id="modal-brief" class="screen dim hidden">
+      <div class="card">
+        <div class="badge" id="brief-num"></div>
+        <h2 id="brief-title"></h2>
+        <p id="brief-task" class="lead"></p>
+        <p id="brief-tip" class="tip"></p>
+        <ul class="guide">
+          <li><b>✊ 抓黏土</b>在黏土罐上握拳，移到底板上張開手放下</li>
+          <li><b>🤏 捏高</b>拇指和食指捏住，往上拉</li>
+          <li><b>✋ 壓平</b>張開手掌放在黏土上停住</li>
+          <li><b>👋 抹平</b>張開手掌來回抹</li>
+          <li><b>🟢 放黏土</b>從黏土罐拖到土盤上放開</li>
+          <li><b>👆 手指工具</b>左下角選工具，一根手指在黏土上按住或滑動</li>
+          <li><b>🔄 看立體</b>在土盤外面拖曳可以轉動整個畫面；兩根手指張開縮放</li>
+        </ul>
+        <button id="brief-go" class="btn big primary">開始捏！</button>
+      </div>
+    </section>
+
+    <!-- 結果 -->
+    <section id="modal-result" class="screen dim hidden">
+      <div class="card">
+        <h2 id="result-title"></h2>
+        <div id="result-stars" class="stars"></div>
+        <div id="result-score"></div>
+        <ul id="result-hints"></ul>
+        <div id="result-reveal" class="reveal hidden">
+          <div class="reveal-name"></div>
+          <p class="reveal-fact"></p>
+        </div>
+        <div class="row">
+          <button id="result-retry" class="btn big">繼續修改</button>
+          <button id="result-next" class="btn big primary">下一關 →</button>
+        </div>
+      </div>
+    </section>
+
+    <pre id="debug" class="hidden"></pre>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

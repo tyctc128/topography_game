@@ -1,0 +1,465 @@
+:root {
+  --ink: #3e2723;
+  --paper: #fffaf0;
+  --primary: #ef6c00;
+  --primary-ink: #fff;
+  --line: rgba(62, 39, 35, 0.15);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  font-family: 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', system-ui, sans-serif;
+  color: var(--ink);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  margin: 0;
+  /* iPad Safari 就算 overflow: hidden 也會被手指拖動捲走，所以把整頁釘住 */
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  /* 沒開鏡頭時像一張木桌 */
+  background: radial-gradient(ellipse at 50% 40%, #d7b98e, #a47148 75%, #6d4c2f);
+}
+
+.hidden {
+  display: none !important;
+}
+
+#gl,
+#overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+}
+/* 手勢模式的鏡頭小預覽（不做 AR，不鋪滿背景） */
+#video {
+  position: fixed;
+  z-index: 4;
+  left: 12px;
+  bottom: calc(112px + var(--safe-bottom));
+  width: 200px;
+  height: 150px;
+  object-fit: cover;
+  border: 3px solid #fff;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  opacity: 0.9;
+}
+#video.mirrored {
+  transform: scaleX(-1);
+}
+#gl {
+  z-index: 1;
+}
+#overlay {
+  z-index: 2;
+  touch-action: none;
+}
+
+button {
+  font: inherit;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.btn {
+  min-height: 56px;
+  padding: 10px 20px;
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 20px;
+  font-weight: 700;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, 0.15);
+}
+.btn:active {
+  transform: translateY(2px);
+  box-shadow: none;
+}
+.btn.primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-ink);
+}
+.btn.big {
+  min-height: 68px;
+  font-size: 24px;
+  padding: 12px 28px;
+}
+.btn:disabled {
+  opacity: 0.4;
+}
+
+.panel {
+  background: rgba(255, 250, 240, 0.92);
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+/* 遊戲中 HUD */
+#hud > * {
+  position: fixed;
+  z-index: 5;
+}
+#task {
+  top: calc(12px + var(--safe-top));
+  left: 12px;
+  max-width: min(46vw, 460px);
+  padding: 12px 18px;
+}
+#task-title {
+  font-size: 26px;
+  font-weight: 800;
+}
+#task-text {
+  font-size: 18px;
+  line-height: 1.4;
+  margin-top: 2px;
+}
+#top-buttons {
+  top: calc(12px + var(--safe-top));
+  right: 12px;
+  display: flex;
+  gap: 8px;
+}
+#legend {
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 12px 12px 12px 10px;
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+}
+#legend .bar {
+  width: 22px;
+  border-radius: 6px;
+}
+#legend .ticks {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+}
+#legend .hi {
+  color: #d32f2f;
+}
+#tools {
+  left: 12px;
+  bottom: calc(12px + var(--safe-bottom));
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+}
+.tools-title {
+  writing-mode: vertical-rl;
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.6;
+}
+.tool {
+  width: 72px;
+  height: 72px;
+  border: 3px solid transparent;
+  border-radius: 14px;
+  background: #fff;
+  font-size: 26px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.tool span {
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 4px;
+  color: var(--ink);
+}
+.tool.active {
+  border-color: var(--primary);
+  background: #fff3e0;
+}
+#view-buttons {
+  right: 12px;
+  bottom: calc(104px + var(--safe-bottom));
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+}
+.vbtn {
+  min-width: 56px;
+  height: 52px;
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--ink);
+  font-size: 17px;
+  font-weight: 700;
+}
+.vbtn[data-view='left'],
+.vbtn[data-view='right'] {
+  font-size: 26px;
+}
+#btn-check {
+  right: 16px;
+  bottom: calc(16px + var(--safe-bottom));
+  min-width: 150px;
+  font-size: 30px;
+}
+.pill {
+  left: 50%;
+  bottom: calc(16px + var(--safe-bottom));
+  transform: translateX(-50%);
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  font-size: 16px;
+}
+#toast {
+  position: fixed;
+  z-index: 6;
+  top: 22%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 14px 26px;
+  border-radius: 18px;
+  background: rgba(62, 39, 35, 0.9);
+  color: #fff;
+  font-size: 24px;
+  font-weight: 700;
+  pointer-events: none;
+  text-align: center;
+}
+
+.tag {
+  position: fixed;
+  z-index: 3;
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: #d32f2f;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+  transform: translate(-50%, -140%);
+  pointer-events: none;
+}
+.jar-label {
+  position: fixed;
+  z-index: 3;
+  padding: 2px 10px;
+  border-radius: 10px;
+  background: rgba(255, 250, 240, 0.9);
+  font-size: 15px;
+  font-weight: 800;
+  white-space: nowrap;
+  transform: translate(-50%, 0);
+  pointer-events: none;
+}
+
+/* 全螢幕畫面與彈出卡片 */
+.screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  overflow-y: auto;
+  touch-action: pan-y; /* 選關、說明卡太長時仍可上下捲 */
+}
+.screen.dim {
+  background: rgba(0, 0, 0, 0.35);
+}
+.card {
+  width: min(640px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  touch-action: pan-y;
+  padding: 28px 32px;
+  border-radius: 28px;
+  background: var(--paper);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+.card.wide {
+  width: min(900px, 100%);
+}
+h1 {
+  font-size: 44px;
+  margin: 0 0 8px;
+}
+h2 {
+  font-size: 34px;
+  margin: 4px 0 8px;
+}
+.lead {
+  font-size: 22px;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+.tip {
+  font-size: 18px;
+  background: #fff3e0;
+  border-radius: 14px;
+  padding: 10px 14px;
+}
+.note {
+  font-size: 14px;
+  opacity: 0.65;
+}
+.msg {
+  min-height: 1.4em;
+  color: #c62828;
+  font-weight: 700;
+}
+.choices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+.choices small {
+  display: block;
+  font-size: 15px;
+  font-weight: 400;
+  opacity: 0.85;
+}
+.guide {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  text-align: left;
+  font-size: 16px;
+}
+.guide li {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 8px 10px;
+}
+.guide b {
+  display: block;
+  font-size: 18px;
+}
+.badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: #fff;
+  font-weight: 700;
+}
+#level-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 16px;
+}
+.level {
+  min-height: 120px;
+  border: 3px solid var(--line);
+  border-radius: 20px;
+  background: #fff;
+  font-size: 28px;
+  font-weight: 800;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.level small {
+  font-size: 15px;
+  font-weight: 600;
+  opacity: 0.7;
+}
+.level .stars {
+  font-size: 22px;
+}
+.stars {
+  font-size: 48px;
+  letter-spacing: 6px;
+  color: #ffb300;
+}
+#result-score {
+  font-size: 22px;
+  font-weight: 700;
+}
+#result-hints {
+  text-align: left;
+  font-size: 22px;
+  line-height: 1.5;
+}
+.reveal {
+  margin: 14px 0;
+  padding: 14px;
+  border-radius: 16px;
+  background: #e8f5e9;
+}
+.reveal-name {
+  font-size: 28px;
+  font-weight: 800;
+}
+.reveal-fact {
+  font-size: 18px;
+  line-height: 1.5;
+  margin: 6px 0 0;
+}
+.row {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+#debug {
+  position: fixed;
+  z-index: 20;
+  left: 12px;
+  top: 140px;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #0f0;
+  font: 12px/1.4 ui-monospace, Menlo, monospace;
+  pointer-events: none;
+  white-space: pre;
+}
+
+@media (max-width: 760px) {
+  #task {
+    max-width: calc(100vw - 24px);
+    top: calc(80px + var(--safe-top));
+  }
+  .tool {
+    width: 60px;
+    height: 60px;
+  }
+  #legend {
+    display: none;
+  }
+}
