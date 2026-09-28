@@ -11,6 +11,6 @@ SSO_PROJECT = "hspssso"
 [[d1_databases]]
 binding = "DB"
 database_name = "topography"
-# 第一次部署前執行 `npx wrangler d1 create topography`，把印出的 database_id 貼到這裡
-database_id = "00000000-0000-0000-0000-000000000000"
+# D1 資料庫（2026-09-28 建立）
+database_id = "381072de-52ef-48d8-b819-72fe58f15684"
 migrations_dir = "migrations"
