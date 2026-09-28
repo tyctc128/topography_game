@@ -263,3 +263,89 @@ td.wrap {
   font-size: 12px;
   color: #8fa487;
 }
+
+/* ---------- 任務列（取代右側任務卡，把空間留給土盤） ---------- */
+.workspace.solo {
+  grid-template-columns: minmax(0, 1fr);
+}
+.task-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 18px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 10px 12px 10px 18px;
+  background: #fffefb;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+}
+.task-bar-main {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  min-width: 0;
+}
+.task-bar-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  color: #879174;
+}
+.task-bar-label svg,
+.task-bar-targets svg {
+  width: 16px;
+  height: 16px;
+}
+.task-bar-main strong {
+  font-size: 19px;
+  letter-spacing: 1px;
+}
+.task-bar-targets {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  font-size: 13px;
+  color: #5f6b57;
+}
+.task-bar-targets span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.task-bar-targets svg {
+  color: #83986c;
+}
+.task-bar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.task-bar-actions .primary,
+.task-bar-actions .secondary {
+  padding: 10px 16px;
+  font-size: 15px;
+}
+/* 任務說明彈窗裡的卡片 */
+.mission.brief {
+  border: 0;
+  padding: 0;
+  background: none;
+}
+.mission.brief p {
+  font-size: 16px;
+}
+/* 土盤佔滿寬度後，高度也放大一點 */
+.workspace.solo .playground {
+  min-height: max(480px, calc(100svh - 320px));
+}
+@media (max-width: 850px) {
+  .task-bar-targets {
+    display: none;
+  }
+}

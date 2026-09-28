@@ -255,11 +255,11 @@ ${
 <div class="step-row">${this.stepTrack()}</div>
 <div data-role="bench">${workbenchMarkup(level, this.ctx.cfg, {
       exam: true,
-      footerHtml: `<button class="primary" data-act="check" ${p.checksLeft < 1 ? 'disabled' : ''}>${icon('check')}${p.checksLeft < 1 ? '已使用檢查' : '檢查地形 · 剩 1 次'}</button><button class="secondary wide" data-act="submit">提交這一題 ${icon('arrow')}</button><div class="small-note">檢查會給提示，完成後仍要按「提交」</div>`,
+      actionsHtml: `<button class="secondary" data-act="check" ${p.checksLeft < 1 ? 'disabled' : ''}>${icon('check')}${p.checksLeft < 1 ? '已使用檢查' : '檢查 · 剩 1 次'}</button><button class="primary" data-act="submit">提交這一題 ${icon('arrow')}</button>`,
     })}</div>
-<div class="underbar"><span>${icon('clock')}每題獨立計時，時間到會自動提交。</span></div>`;
+<div class="underbar"><span>${icon('clock')}每題獨立計時，時間到會自動提交。「檢查」會給提示，完成後仍要按「提交」。</span></div>`;
     const bench = this.main.querySelector('[data-role=bench]') as HTMLElement;
-    this.wb = new Workbench(bench, this.ctx.cfg, this.ctx.audio, level);
+    this.wb = new Workbench(bench, this.ctx.cfg, this.ctx.audio, level, true, true);
     bench.querySelector('[data-act=check]')!.addEventListener('click', () => void this.check());
     bench.querySelector('[data-act=submit]')!.addEventListener('click', () => void this.submit(false));
     window.scrollTo(0, 0);

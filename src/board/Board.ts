@@ -102,22 +102,20 @@ export class Board {
     this.overlay.resize(w, h);
   }
 
-  /** 量出土盤區域四周被工具列、標題、圖例蓋住的寬度。 */
+  /**
+   * 量出土盤區域被介面擋住的寬度。上方標題、左下與右下的按鈕都只佔角落，
+   * 只有正中間的工具列和右側圖例需要避開，土盤才能畫得大。
+   */
   private insets(): { top: number; right: number; bottom: number; left: number } {
     const host = this.host.getBoundingClientRect();
     const rect = (sel: string) => this.host.querySelector(sel)?.getBoundingClientRect() ?? null;
-    const top = rect('.scene-top');
     const tools = rect('.tools');
-    const bottom = rect('.scene-bottom');
     const legend = rect('.altitude');
     const horizontalTools = tools ? tools.width > tools.height : false;
     const pad = 10;
     return {
-      top: top ? top.bottom - host.top + pad : 0,
-      bottom: Math.max(
-        bottom ? host.bottom - bottom.top + pad : 0,
-        horizontalTools && tools ? host.bottom - tools.top + pad : 0,
-      ),
+      top: 28,
+      bottom: horizontalTools && tools ? host.bottom - tools.top + pad : rect('.scene-bottom') ? host.bottom - rect('.scene-bottom')!.top : pad,
       left: !horizontalTools && tools ? tools.right - host.left + pad : pad,
       right: legend ? host.right - legend.left + pad : pad,
     };

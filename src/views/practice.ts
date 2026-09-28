@@ -65,9 +65,9 @@ export class PracticeView implements View {
     const bench = this.root.querySelector('[data-role=bench]') as HTMLElement;
     bench.innerHTML = workbenchMarkup(this.level, this.ctx.cfg, {
       exam: false,
-      footerHtml: `<button class="primary" data-act="check">${icon('check')}檢查我的地形</button><div class="small-note">放心試試看，可以一直練習喔！</div>`,
+      actionsHtml: `<button class="primary" data-act="check">${icon('check')}檢查我的地形</button>`,
     });
-    this.wb = new Workbench(bench, this.ctx.cfg, this.ctx.audio, this.level);
+    this.wb = new Workbench(bench, this.ctx.cfg, this.ctx.audio, this.level, false, true);
     bench.querySelector('[data-act=check]')!.addEventListener('click', () => this.check());
     this.root.querySelectorAll<HTMLButtonElement>('[data-level]').forEach((b) => {
       const on = Number(b.dataset.level) === this.index;

@@ -25,15 +25,37 @@ const SUGGESTED_TOOL: Record<string, Tool> = {
 
 export interface MissionOptions {
   exam: boolean;
-  /** 任務卡底部的按鈕區（已跳脫的 HTML），由呼叫端決定。 */
-  footerHtml: string;
+  /** 任務列右邊的按鈕（已跳脫的 HTML），由呼叫端決定，例如「檢查」「提交」。 */
+  actionsHtml: string;
 }
 
-/** 土盤＋任務卡的 HTML；把 Board 掛上去要再呼叫 Workbench。 */
+/** 任務說明：進入關卡時跳出一次，之後可從任務列的「任務說明」再打開。 */
+export function missionHtml(level: LevelDef, exam: boolean): string {
+  return `<div class="mission brief">
+    <div class="mission-label">${icon('target')}${exam ? '你的測驗任務' : '今天的小任務'}</div>
+    <p>${esc(level.intro)}</p>
+    <div class="rule-line"></div>
+    <span class="target-label">觀察這兩個特徵</span>
+    <div class="target-list">${level.targets.map((t) => `<div class="target-item">${icon('check')}<span>${esc(t)}</span></div>`).join('')}</div>
+    <div class="tip">${icon('bulb')}<span>${esc(level.tip)}</span></div>
+  </div>`;
+}
+
+export function showMission(level: LevelDef, exam: boolean): Promise<string> {
+  return modal(`捏出「${level.title}」`, missionHtml(level, exam), [{ label: exam ? '開始捏（倒數已經開始）' : '開始捏！', primary: true, value: 'ok' }]);
+}
+
+/** 任務列＋土盤的 HTML；把 Board 掛上去要再呼叫 Workbench。 */
 export function workbenchMarkup(level: LevelDef, cfg: TerrainConfig, opts: MissionOptions): string {
   const stops = [...cfg.ramp].reverse();
   const grad = cfg.ramp.map((s, i) => `${s.color} ${Math.round((i / (cfg.ramp.length - 1)) * 100)}%`).join(',');
-  return `<div class="workspace">
+  return `<div class="task-bar">
+    <div class="task-bar-main"><span class="task-bar-label">${icon('target')}${opts.exam ? '測驗任務' : '小任務'}</span><strong>捏出「${esc(level.title)}」</strong><span class="task-bar-targets">${level.targets
+      .map((t) => `<span>${icon('check')}${esc(t)}</span>`)
+      .join('')}</span></div>
+    <div class="task-bar-actions"><button class="secondary" data-act="brief">${icon('book')}任務說明</button>${opts.actionsHtml}</div>
+  </div>
+<div class="workspace solo">
   <section class="playground" aria-label="可操作地形土盤">
     <div class="surface-texture"></div>
     <div class="scene-top"><span class="scene-label">你的地形工作臺</span><label class="toggle-label"><input type="checkbox" checked data-act="contours">顯示等高線</label></div>
@@ -54,16 +76,6 @@ export function workbenchMarkup(level: LevelDef, cfg: TerrainConfig, opts: Missi
       .map(([k, t]) => `<button data-view="${k}" class="${k === 'orbit' ? 'active' : ''}">${t}</button>`)
       .join('')}</div><span class="scene-hint">${icon('hand')}土盤外拖曳旋轉 · 雙指縮放</span><div class="scene-actions"><button class="secondary icon-btn" data-act="undo" title="復原" aria-label="復原上一步">${icon('undo')}</button><button class="secondary icon-btn" data-act="reset" title="重新捏塑" aria-label="重新捏塑">${icon('rotate')}</button></div></div>
   </section>
-  <aside class="mission">
-    <div class="mission-label">${icon('target')}${opts.exam ? '你的測驗任務' : '今天的小任務'}</div>
-    <h2>捏出「${esc(level.title)}」</h2>
-    <p>${esc(level.intro)}</p>
-    <div class="rule-line"></div>
-    <span class="target-label">觀察這兩個特徵</span>
-    <div class="target-list">${level.targets.map((t) => `<div class="target-item">${icon('check')}<span>${esc(t)}</span></div>`).join('')}</div>
-    <div class="tip">${icon('bulb')}<span>${esc(level.tip)}</span></div>
-    <div class="mission-footer">${opts.footerHtml}</div>
-  </aside>
 </div>`;
 }
 
@@ -77,6 +89,8 @@ export class Workbench {
     cfg: TerrainConfig,
     audio: AudioManager,
     level: LevelDef,
+    exam = false,
+    showBrief = true,
   ) {
     const pg = root.querySelector('.playground') as HTMLElement;
     this.board = new Board(pg, cfg, audio);
@@ -115,6 +129,8 @@ export class Workbench {
     });
     this.level = level;
     this.load(level);
+    root.querySelector('[data-act=brief]')!.addEventListener('click', () => void showMission(this.level, exam));
+    if (showBrief) void showMission(level, exam);
   }
 
   private level: LevelDef;
