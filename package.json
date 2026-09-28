@@ -19,6 +19,7 @@
     "three": "^0.169.0"
   },
   "devDependencies": {
+    "@types/node": "^22.20.4",
     "@types/three": "^0.169.0",
     "cloudflared": "^0.7.0",
     "eruda": "^3.4.0",
