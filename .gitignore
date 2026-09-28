@@ -3,3 +3,9 @@ dist
 public/mediapipe
 .playwright-mcp
 .claude/
+
+# 學生個資與原始題目檔，不可提交到公開儲存庫
+account.xlsx
+*.xlsx
+*.docx
+private/
