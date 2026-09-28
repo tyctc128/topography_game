@@ -54,13 +54,27 @@ export class TouchInput {
     el.addEventListener('pointercancel', (e) => this.up(e, true));
   }
 
+  /** 事件座標換成土盤區域內的座標（畫布不一定鋪滿整個視窗）。 */
+  private local(e: PointerEvent): Pt {
+    const r = this.el.getBoundingClientRect();
+    return { x: e.clientX - r.left, y: e.clientY - r.top };
+  }
+
+  /** 暫停（例如時間到、對話框開著）：結束進行中的動作。 */
+  cancel(): void {
+    this.finish(true);
+    this.pointers.clear();
+    this.mode = 'none';
+    this.vel = { az: 0, tilt: 0 };
+  }
+
   get active(): boolean {
     return this.pointers.size > 0;
   }
 
   /** 旋轉靈敏度：拖過整個螢幕高度 ≈ 轉 300°。 */
   private get degPerPx(): number {
-    return 300 / Math.max(300, window.innerHeight);
+    return 300 / Math.max(300, this.el.clientHeight);
   }
 
   private down(e: PointerEvent): void {
@@ -74,7 +88,7 @@ export class TouchInput {
     } catch {
       /* 抓不到也不影響操作 */
     }
-    const p = { x: e.clientX, y: e.clientY };
+    const p = this.local(e);
     this.pointers.set(e.pointerId, p);
     this.vel = { az: 0, tilt: 0 };
     this.lastMove = performance.now();
@@ -123,7 +137,7 @@ export class TouchInput {
   private move(e: PointerEvent): void {
     const prev = this.pointers.get(e.pointerId);
     if (!prev) return;
-    const p = { x: e.clientX, y: e.clientY };
+    const p = this.local(e);
     const dx = p.x - prev.x;
     const dy = p.y - prev.y;
     const k = this.degPerPx;
@@ -158,7 +172,7 @@ export class TouchInput {
     if (!this.pointers.delete(e.pointerId)) return;
     if (e.pointerId === this.mainId) {
       if (this.mode === 'carry' && !cancelled) {
-        const uv = this.env.toUV({ x: e.clientX, y: e.clientY });
+        const uv = this.env.toUV(this.local(e));
         if (uv) {
           this.queue.push({ kind: 'drop', u: uv.u, v: uv.v, radius: G.dropRadius, volume: G.dropVolume });
           this.events.push('drop');

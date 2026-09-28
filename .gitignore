@@ -9,3 +9,7 @@ account.xlsx
 *.xlsx
 *.docx
 private/
+社會地形design/
+worker/.dev.vars
+.wrangler/
+worker/.wrangler/

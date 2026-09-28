@@ -38,6 +38,8 @@ uniform vec3 uStopC[${MAX_STOPS}];
 uniform float uMinor;
 uniform float uMajor;
 uniform float uHi;
+uniform vec3 uHiColor;
+uniform float uContours;
 uniform float uTime;
 uniform vec3 uLight;
 varying float vH;
@@ -68,12 +70,13 @@ void main() {
   float diff = max(dot(normalize(vN), uLight), 0.0);
   c *= 0.55 + 0.6 * diff;
   if (m > uMinor * 0.5) {
-    c = mix(c, c * 0.55, contour(m, uMinor, 1.0) * 0.8);
-    c = mix(c, c * 0.35, contour(m, uMajor, 1.8));
+    c = mix(c, c * 0.55, contour(m, uMinor, 1.0) * 0.8 * uContours);
+    c = mix(c, c * 0.35, contour(m, uMajor, 1.8) * uContours);
   }
+  // 1000 m 線即使關掉等高線也保留，因為它是分辨山地與丘陵的關鍵
   float fw = max(fwidth(m), 1e-3);
   float hi = 1.0 - smoothstep(0.0, 2.6 * fw, abs(m - uHi));
-  c = mix(c, vec3(0.7, 0.01, 0.015), hi); // 線性色彩：約 #d8171e
+  c = mix(c, uHiColor, hi);
   float pulse = 0.35 + 0.3 * sin(uTime * 7.0);
   c = mix(c, vec3(1.0, 0.05, 0.08), vMask * pulse);
   gl_FragColor = vec4(c, 1.0);
@@ -130,6 +133,8 @@ export class Renderer {
         uMinor: { value: cfg.contour.minor },
         uMajor: { value: cfg.contour.major },
         uHi: { value: cfg.contour.highlight },
+        uHiColor: { value: new THREE.Color(cfg.highlightColor ?? '#b54535') },
+        uContours: { value: 1 },
         uTime: { value: 0 },
         uLight: { value: new THREE.Vector3(-0.5, 1, 0.6).normalize() },
       },
@@ -137,19 +142,12 @@ export class Renderer {
     this.board = new THREE.Mesh(geo, mat);
     this.scene.add(this.board);
 
-    // 底座與海
-    const slab = new THREE.Mesh(
-      new THREE.BoxGeometry(1.02, 0.04, 1.02),
-      new THREE.MeshStandardMaterial({ color: 0x8d6e63, roughness: 0.9 }),
-    );
-    slab.position.y = -0.0205;
-    this.scene.add(slab);
-    const sea = new THREE.Mesh(
-      new THREE.PlaneGeometry(1.34, 1.34).rotateX(-Math.PI / 2),
-      new THREE.MeshStandardMaterial({ color: 0x4fa3e0, roughness: 0.4, transparent: true, opacity: 0.9 }),
-    );
-    sea.position.y = -0.03;
-    this.scene.add(sea);
+    // 木製托盤：外框（淺木色邊）與側面（深木色），土盤放在裡面
+    const wood = new THREE.MeshStandardMaterial({ color: 0xc5aa80, roughness: 0.85 });
+    const woodTop = new THREE.MeshStandardMaterial({ color: 0xd8c39b, roughness: 0.8 });
+    const tray = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.06, 1.1), [wood, wood, woodTop, wood, wood, wood]);
+    tray.position.y = -0.031;
+    this.scene.add(tray);
 
     // 左右兩個黏土罐
     for (const side of ['left', 'right'] as const) {
@@ -173,7 +171,7 @@ export class Renderer {
       rim.position.y = JAR_H;
       const clay = new THREE.Mesh(
         new THREE.CylinderGeometry(JAR_R * 0.92, JAR_R * 0.84, 1, 40),
-        new THREE.MeshStandardMaterial({ color: 0x9ccc65, roughness: 0.7 }),
+        new THREE.MeshStandardMaterial({ color: 0x8db276, roughness: 0.7 }),
       );
       this.jarClay[side] = clay;
       g.add(jar, bottom, rim, clay);
@@ -181,13 +179,22 @@ export class Renderer {
     }
   }
 
-  resize(w: number, h: number): void {
+  /**
+   * insets：畫面四周被介面蓋住的寬度（px），土盤會放在剩下的空白區域正中間。
+   */
+  resize(w: number, h: number, insets = { top: 0, right: 0, bottom: 0, left: 0 }): void {
     this.renderer.setSize(w, h, false);
     const cam = this.camera;
     cam.aspect = w / h;
-    // 讓底板與兩個黏土罐都在畫面內
+    const availW = Math.max(120, w - insets.left - insets.right);
+    const availH = Math.max(120, h - insets.top - insets.bottom);
+    // 讓托盤與兩個黏土罐都在空白區域內
     const t = Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
-    this.baseDist = Math.max(0.62 / t, 1.0 / (t * cam.aspect));
+    const tv = t * (availH / h);
+    const th = t * cam.aspect * (availW / w);
+    this.baseDist = Math.max(0.62 / tv, 1.0 / th);
+    // 把畫面中心移到空白區域中心
+    cam.setViewOffset(w, h, (insets.right - insets.left) / 2, (insets.bottom - insets.top) / 2, w, h);
     cam.updateProjectionMatrix();
     this.applyView();
   }
@@ -206,6 +213,23 @@ export class Renderer {
 
   zoomBy(f: number): void {
     this.viewTarget.zoom = THREE.MathUtils.clamp(this.viewTarget.zoom / f, ZOOM_MIN, ZOOM_MAX);
+  }
+
+  /** 離開畫面時釋放 WebGL 資源；iPad 同時能開的 WebGL 數量有限。 */
+  dispose(): void {
+    this.scene.traverse((o) => {
+      const m = o as THREE.Mesh;
+      m.geometry?.dispose();
+      const mat = m.material as THREE.Material | THREE.Material[] | undefined;
+      if (Array.isArray(mat)) mat.forEach((x) => x.dispose());
+      else mat?.dispose();
+    });
+    this.renderer.dispose();
+    this.renderer.forceContextLoss();
+  }
+
+  setContours(on: boolean): void {
+    this.board.material.uniforms.uContours.value = on ? 1 : 0;
   }
 
   setTilt(deg: number): void {

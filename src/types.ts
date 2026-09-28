@@ -5,6 +5,7 @@ export interface TerrainConfig {
   thresholds: { plain: number; hillsMax: number; mountainMin: number };
   contour: { minor: number; major: number; highlight: number };
   ramp: { m: number; color: string }[];
+  highlightColor?: string;
 }
 
 export interface StartShape {
@@ -20,7 +21,8 @@ export interface LevelDef {
   id: string;
   target: Landform;
   title: string;
-  task: string;
+  intro: string;
+  targets: string[];
   tip: string;
   start: StartShape;
   budget: number; // 黏土罐容量，以「整塊底板的平均高度」計（0–1）

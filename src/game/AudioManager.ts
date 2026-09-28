@@ -44,6 +44,12 @@ export class AudioManager {
     }
   }
 
+  /** 倒數用的短嗶聲。 */
+  beep(freq: number, dur: number): void {
+    if (this.muted || !this.ctx) return;
+    this.tone(freq, this.ctx.currentTime, dur, 'square');
+  }
+
   speak(text: string): void {
     if (this.muted || !('speechSynthesis' in window)) return;
     speechSynthesis.cancel();

@@ -1,0 +1,16 @@
+# 黏土捏地形：班級測驗 API（Cloudflare Worker + D1）
+name = "topography-api"
+main = "src/index.ts"
+compatibility_date = "2026-09-01"
+
+[vars]
+# 只允許這些網站呼叫 API（GitHub Pages 與本機開發）
+ALLOWED_ORIGINS = "https://tyctc128.github.io,http://localhost:5180"
+SSO_PROJECT = "hspssso"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "topography"
+# 第一次部署前執行 `npx wrangler d1 create topography`，把印出的 database_id 貼到這裡
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"

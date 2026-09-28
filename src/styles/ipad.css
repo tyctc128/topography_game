@@ -1,0 +1,87 @@
+/* 來源：社會地形design 原型 ipad.css（iPad 版面） */
+/* Tablet-first working surface. Browser zoom remains available outside the soil. */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;scroll-padding-bottom:100px}
+body{min-height:100vh;min-height:100svh}
+button,a,input,select,textarea{touch-action:manipulation}
+button{min-height:44px}
+input,select,textarea{font-size:16px!important}
+.shell{padding-right:env(safe-area-inset-right);padding-bottom:env(safe-area-inset-bottom)}
+.rail{padding-top:max(20px,env(safe-area-inset-top));padding-bottom:max(20px,env(safe-area-inset-bottom))}
+.playground{isolation:isolate;--horizontal-tools:0}
+.terrain-canvas{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;touch-action:none}
+.tools,.view-buttons{-webkit-user-select:none;user-select:none}
+.tool{width:60px;min-height:60px;font-size:14px}
+.toggle-label{min-height:44px;font-size:14px}
+.toggle-label input{width:20px;height:20px}
+.view-buttons button{min-width:50px;min-height:44px;font-size:14px}
+.student select{min-width:82px;max-width:110px;min-height:44px;padding:7px}
+.student{row-gap:8px}.student .star-score{white-space:nowrap}
+.table-wrap{overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+.teacher-nav{overflow-x:auto;flex-shrink:0}.teacher-nav button{white-space:nowrap}
+dialog{max-height:calc(100vh - 40px);max-height:calc(100dvh - 40px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+dialog::backdrop{-webkit-backdrop-filter:blur(4px)}
+.dialog-actions{flex-wrap:wrap}.dialog-actions button{min-width:100px}
+.level:hover{transform:none}
+#toast{max-width:calc(100vw - 32px);width:max-content;text-align:center;bottom:calc(24px + env(safe-area-inset-bottom))}
+
+/* All iPad widths: tools sit underneath the soil, within comfortable thumb reach. */
+@media(min-width:561px) and (max-width:1400px){
+ .playground{--horizontal-tools:1;min-height:450px}
+ .tools{top:auto;bottom:14px;left:50%;transform:translateX(-50%);flex-direction:row;gap:5px;padding:6px;max-width:calc(100% - 24px)}
+ .tool{width:60px;min-height:59px;padding:6px 3px;gap:3px}
+ .scene-bottom{bottom:96px;left:16px;right:16px}
+ .scene-hint{display:none}.canvas-note{top:83px;left:24px;max-width:calc(100% - 112px);font-size:12px}
+ .scene-top{top:15px;left:20px;right:20px}.altitude{top:87px;right:16px}
+ .scene-label{font-size:13px}.mission h2{font-size:23px}
+ .primary,.secondary,.target-item{font-size:15px}.small-note{font-size:12px}
+ .mission-footer{min-width:0}.mission p{font-size:16px;line-height:1.7}
+ .top-actions{gap:12px}.top-actions .help-btn{min-width:70px}
+}
+
+/* Landscape iPad, including Safari/Chrome with their address bar visible. */
+@media(min-width:851px) and (max-width:1400px) and (orientation:landscape){
+ .shell{padding-left:72px}.rail{width:72px;gap:18px}.rail button{width:62px;min-height:70px}.rail-label{display:none}
+ .topbar{height:65px;padding:0 24px}.brand{font-size:20px}.brand small{display:none}.prototype-tag{display:none}
+ .content{padding:16px 24px 24px}.title-row{margin-bottom:13px}.title-row h1{font-size:25px;margin:3px 0 5px}.title-row .eyebrow{display:none}
+ .levels{gap:8px;margin-bottom:14px}.level{min-height:57px;padding:9px 11px;gap:8px}.level .num{display:none}.level strong{font-size:15px}.terrain-icon{width:31px;height:27px}
+ .workspace{grid-template-columns:minmax(0,1fr) 250px;gap:16px;align-items:stretch}
+ .playground{min-height:460px;min-height:max(440px,calc(100svh - 255px))}
+ .mission{padding:16px 18px}.mission h2{font-size:22px;margin:6px 0 8px}.mission .rule-line{margin:9px 0}.target-list{gap:8px;margin:10px 0}.tip{font-size:13px;padding:10px;line-height:1.65}.mission-footer{margin-top:12px}.mission .primary{padding:12px;min-height:48px}.mission .small-note{font-size:11px;margin-top:6px}.mission p{font-size:15px}
+ .underbar{margin:7px 0 17px}.learn-strip{padding-top:17px}.page-footer{margin-top:20px}
+ .board-layout{grid-template-columns:minmax(0,1fr) 230px}.groups{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* Portrait iPad: keep the full canvas; put task details immediately beneath it. */
+@media(min-width:561px) and (max-width:1024px) and (orientation:portrait){
+ .shell{padding-left:env(safe-area-inset-left);padding-bottom:calc(88px + env(safe-area-inset-bottom))}
+ .rail{inset:auto 0 0;width:100%;height:calc(75px + env(safe-area-inset-bottom));padding:6px 20px calc(6px + env(safe-area-inset-bottom));flex-direction:row;justify-content:center;gap:48px}
+ .rail button{min-height:60px;width:120px;padding:7px;font-size:14px;gap:4px}
+ .rail .brand-symbol,.rail-label,.rail .bottom{display:none}
+ .topbar{height:72px;padding:0 26px}.brand small,.prototype-tag{display:none}
+ .content{padding:22px 24px}.title-row{margin-bottom:20px}.title-row h1{font-size:27px}.title-row .eyebrow{display:none}
+ .levels{gap:8px;margin-bottom:18px}.level{min-height:75px;flex-direction:column;padding:9px 5px;gap:6px;text-align:center}.level .num{display:none}.level strong{font-size:15px}
+ .workspace{grid-template-columns:minmax(0,1fr);gap:16px}
+ .playground{min-height:480px;min-height:clamp(460px,48svh,590px)}
+ .mission{display:grid;grid-template-columns:1fr 1fr;gap:0 25px;padding:22px 24px}
+ .mission>.mission-label,.mission>h2,.mission>p{grid-column:1}.mission>.rule-line{display:none}
+ .mission>.target-label{grid-column:2;grid-row:1}.mission>.target-list{grid-column:2;grid-row:2 / 4;margin:10px 0}
+ .mission>.tip{grid-column:2;grid-row:4}.mission-footer{grid-column:1;grid-row:4;margin-top:16px}
+ .mission-footer .small-note{line-height:1.5}.board-layout{grid-template-columns:1fr}.groups{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .unassigned{max-height:none;display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}.unassigned h3,.unassigned>p{grid-column:1 / -1}
+ #toast{bottom:calc(92px + env(safe-area-inset-bottom))}
+}
+
+/* Narrow iPad Split View keeps every tool and allows the page to scroll naturally. */
+@media(max-width:560px){
+ .shell{padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+ .rail{height:calc(70px + env(safe-area-inset-bottom));padding:4px 12px calc(4px + env(safe-area-inset-bottom))}
+ .title-row{flex-wrap:wrap;gap:9px}.title-row .badge{margin-top:0}.title-row h1{font-size:24px}.title-row p{font-size:14px;line-height:1.7}
+ .playground{--horizontal-tools:1;min-height:465px}.tools{top:auto;bottom:13px;left:10px;right:10px;transform:none;flex-direction:row;gap:2px;justify-content:space-around;padding:5px}
+ .tool{width:calc((100% - 8px)/5);min-width:44px;min-height:60px;font-size:12px;padding:7px 0}
+ .scene-bottom{bottom:95px;left:12px;right:12px}.view-buttons{padding:3px}.view-buttons button{padding:5px 8px;min-width:44px}
+ .scene-label{font-size:12px;letter-spacing:0}.toggle-label{font-size:12px;padding:6px 8px;gap:5px}
+ .canvas-note{left:14px;top:77px;max-width:calc(100% - 95px);font-size:11px}.altitude{top:92px}
+ .level strong{font-size:12px}.scene-hint{display:none}.mission{display:block}.mission-footer{margin-top:20px}
+ #toast{bottom:calc(85px + env(safe-area-inset-bottom))}
+}
+@media(pointer:coarse){.tool,.view-buttons button,.level{-webkit-touch-callout:none}.student{cursor:default}.top-actions button{min-height:44px}}

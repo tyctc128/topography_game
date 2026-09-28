@@ -1,13 +1,40 @@
 {
   "maxElevation": 4000,
-  "thresholds": { "plain": 100, "hillsMax": 1000, "mountainMin": 1000 },
-  "contour": { "minor": 100, "major": 500, "highlight": 1000 },
+  "thresholds": {
+    "plain": 100,
+    "hillsMax": 1000,
+    "mountainMin": 1000
+  },
+  "contour": {
+    "minor": 100,
+    "major": 500,
+    "highlight": 1000
+  },
   "ramp": [
-    { "m": 0, "color": "#2e7d32" },
-    { "m": 100, "color": "#8bc34a" },
-    { "m": 500, "color": "#fdd835" },
-    { "m": 1000, "color": "#a1887f" },
-    { "m": 2000, "color": "#6d4c41" },
-    { "m": 3500, "color": "#ffffff" }
-  ]
+    {
+      "m": 0,
+      "color": "#8db276"
+    },
+    {
+      "m": 100,
+      "color": "#b8c983"
+    },
+    {
+      "m": 500,
+      "color": "#e3cf85"
+    },
+    {
+      "m": 1000,
+      "color": "#c99f6c"
+    },
+    {
+      "m": 2000,
+      "color": "#957256"
+    },
+    {
+      "m": 3500,
+      "color": "#f4f0e6"
+    }
+  ],
+  "highlightColor": "#b54535"
 }

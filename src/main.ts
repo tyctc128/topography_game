@@ -1,5 +1,9 @@
+import './styles/design.css';
+import './styles/refinements.css';
+import './styles/ipad.css';
+import './styles/board.css';
+import { App } from './app';
 import { params } from './params';
-import { App } from './game/App';
 import type { LevelDef, TerrainConfig } from './types';
 
 async function boot(): Promise<void> {
@@ -8,7 +12,7 @@ async function boot(): Promise<void> {
     import('eruda')
       .then(({ default: eruda }) => {
         eruda.init();
-        eruda.position({ x: 20, y: window.innerHeight * 0.55 }); // 別擋到右下角的「檢查」
+        eruda.position({ x: 20, y: window.innerHeight * 0.55 });
       })
       .catch((e) => console.warn('eruda 載入失敗', e));
   }
@@ -17,11 +21,11 @@ async function boot(): Promise<void> {
     fetch(`${base}config/terrain.json`).then((r) => r.json() as Promise<TerrainConfig>),
     fetch(`${base}config/levels.json`).then((r) => r.json() as Promise<LevelDef[]>),
   ]);
-  new App(terrain, levels);
+  const app = new App(document.getElementById('app')!, terrain, levels, params);
+  if (params.has('debug')) (window as unknown as { __app: App }).__app = app;
 }
 
 boot().catch((e) => {
   console.error(e);
-  const msg = document.getElementById('start-msg');
-  if (msg) msg.textContent = '載入失敗，請重新整理頁面';
+  document.getElementById('app')!.innerHTML = '<p style="padding:40px">載入失敗，請重新整理頁面。</p>';
 });
