@@ -45,7 +45,7 @@ body {
   height: 100vh;
   height: 100dvh;
 }
-/* 手勢模式的鏡頭小預覽（不做 AR，不鋪滿背景） */
+/* 手勢模式的鏡頭小預覽（只縮在角落，不鋪滿背景） */
 #video {
   position: fixed;
   z-index: 4;
