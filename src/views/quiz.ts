@@ -55,6 +55,8 @@ export class QuizView implements View {
   private deadline = 0;
   private lastSecond = -1;
   private busy = false;
+  /** 「開始挑戰」連點兩下時只算一次，避免同時開出兩題與兩個任務說明。 */
+  private starting = false;
   private selected: number | null = null;
   private alive = true;
 
@@ -207,14 +209,21 @@ ${
   // ---------- 作答 ----------
 
   private async start(quizId: string): Promise<void> {
+    if (this.starting) return;
+    this.starting = true;
+    this.main.querySelectorAll<HTMLButtonElement>('[data-start]').forEach((b) => (b.disabled = true));
     this.ctx.audio.unlock();
     try {
-      this.attempt = await api.post<AttemptState>(`/api/quizzes/${quizId}/attempts`);
-    } catch (e) {
-      toast(errorText(e), 4000);
-      return void this.loadList();
+      try {
+        this.attempt = await api.post<AttemptState>(`/api/quizzes/${quizId}/attempts`);
+      } catch (e) {
+        toast(errorText(e), 4000);
+        return void (await this.loadList());
+      }
+      await this.nextItem();
+    } finally {
+      this.starting = false;
     }
-    await this.nextItem();
   }
 
   private async nextItem(): Promise<void> {
